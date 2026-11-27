@@ -332,6 +332,12 @@ s 'udplsi localhost:1113'
 <pre>$ ionstart -i host1.ionrc -l host1.ltprc -b host1.bprc -p host1.ipnrc
 $ bpsink ipn:1.1               <span class="c"># terminal 1: escucha en 1.1</span>
 $ bpsource ipn:1.1 "BPv7_OK"   <span class="c"># terminal 2: envía un bundle a 1.1</span>
+
+<span class="c"># salida de bpsink (27 nov 2026)</span>
+ION event: Payload delivered.
+	payload length is 7.
+	'BPv7_OK'
+
 $ ionstop</pre>
       </div>
       <h3>Lo que enseñó el log</h3>
@@ -358,7 +364,7 @@ $ ionstop</pre>
     <li><span class="when">ago–sep 2024</span><span class="what">Propuesta: <i>Multi-Center Space Data System Prototype Using ION</i> <span class="tag done">hecho</span><span class="small">Tomó como base el prototipo multicentro de T. M. Rich (IEEE Aerospace Conference 2016).</span></span></li>
     <li><span class="when">sep 2024</span><span class="what">ION compilado en Ubuntu 22.04 y probado con <code>bping</code>. Raspberry Pi 3B+ configurada por SSH. GNS3 instalado. <span class="tag done">hecho</span></span></li>
     <li><span class="when">nov 2024</span><span class="what">Presentación en IEEE LATINCOM 2024, Medellín. <span class="tag done">premiada</span></span></li>
-    <li><span class="when">nov 2026</span><span class="what"><a href="#reto01">reto01</a>: un nodo con BPv7 sobre LTP/UDP en loopback. <span class="tag check">captura de bpsink por documentar</span></span></li>
+    <li><span class="when">nov 2026</span><span class="what"><a href="#reto01">reto01</a>: un nodo con BPv7 sobre LTP/UDP en loopback. <code>bpsink</code> recibió <code>'BPv7_OK'</code> (<a href="https://github.com/lcmj2803/ion-labs/blob/main/reto01/bpsink_captura.txt">captura</a>). <span class="tag done">hecho</span></span></li>
     <li><span class="when">siguiente</span><span class="what">Dos nodos en GNS3, con un <code>range</code> que emule el retardo Tierra–Marte. <span class="tag todo">por hacer</span></span></li>
     <li><span class="when">después</span><span class="what">La Raspberry Pi como nodo de vuelo con cFS. Comando y telemetría AMS entre dos centros. Radio real en el último salto. <span class="tag todo">por hacer</span></span></li>
   </ol>

@@ -1,0 +1,11 @@
+# reto01 · 2026-11-27 · ION 4.1.2, BPv7
+$ ionstart -i host1.ionrc -l host1.ltprc -b host1.bprc -p host1.ipnrc
+$ bpsink ipn:1.1            # terminal 1
+$ bpsource ipn:1.1 "BPv7_OK" # terminal 2
+
+## salida de bpsink
+ION event: Payload delivered.
+	payload length is 7.
+	'BPv7_OK'
+ION event: Endpoint stopped.
+Stopping bpsink.

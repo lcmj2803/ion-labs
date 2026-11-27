@@ -72,3 +72,65 @@
 [2026/11/23-00:36:36] [i] ltpdeliv has ended.
 [2026/11/23-00:36:37] [i] rfxclock has ended.
 [2026/11/23-00:36:38] at line 960 of bssp/library/libbsspP.c, Can't find BSSP database.
+[2026/11/27-11:06:51] [i] Span to engine 1 (max BER 0.000001, max xmit segment size 1400, max recv segment size 1): xmit segment loss rate 0.011285, recv segment loss rate 0.000008, max timeouts 4.
+[2026/11/27-11:06:51] [i] Total max export sessions does not exceed estimate.
+[2026/11/27-11:06:51] [i] This node deploys bundle protocol version 7.
+[2026/11/27-11:06:51] [?] Can't find ION security database.
+[2026/11/27-11:06:51] [?] Warning: running without bundle security.
+[2026/11/27-11:06:51] [?] Can't find ION security database.
+[2026/11/27-11:06:52] [i] rfxclock is running.
+[2026/11/27-11:06:52] [i] No congestion collapse predicted.
+[2026/11/27-11:06:52] [i] ionwarn finished.
+[2026/11/27-11:06:52] [?] Can't find ION security database.
+[2026/11/27-11:06:52] [i] bpclock is running.
+[2026/11/27-11:06:52] [i] ltpdeliv is running.
+[2026/11/27-11:06:52] [i] ltpmeter is running.
+[2026/11/27-11:06:52] [i] ltpclock is running.
+[2026/11/27-11:06:52] [i] udplso is running, spec=[127.0.0.1:0], rengine=1.
+[2026/11/27-11:06:52] [i] udplsi is running, spec=[127.0.0.1:1113].
+[2026/11/27-11:06:52] [?] Can't find ION security database.
+[2026/11/27-11:06:52] [i] ltpclo is running.
+[2026/11/27-11:06:52] [?] Can't find ION security database.
+[2026/11/27-11:06:52] [i] bptransit is running.
+[2026/11/27-11:06:52] [?] Can't find ION security database.
+[2026/11/27-11:06:52] [i] ipnadminep is running.
+[2026/11/27-11:06:52] [?] Can't find ION security database.
+[2026/11/27-11:06:52] [i] Not configured for multicast; cpsd stopping.
+[2026/11/27-11:06:52] [?] Can't find ION security database.
+[2026/11/27-11:06:52] [i] ipnfw is running.
+[2026/11/27-11:06:52] [?] Can't find ION security database.
+[2026/11/27-11:06:52] [i] ltpcli is running.
+[2026/11/27-11:06:52] [?] Can't find ION security database.
+[2026/11/27-11:06:52] [i] bpclm is running: ipn:1.0
+[2026/11/27-11:06:53] [i] No congestion collapse predicted.
+[2026/11/27-11:06:53] [i] ionwarn finished.
+[2026/11/27-11:06:56] [?] Can't find ION security database.
+[2026/11/27-11:06:58] [?] Can't find ION security database.
+[2026/11/27-11:06:59] [i] Span to engine 1 (max BER 0.000001, max xmit segment size 1400, max recv segment size 80): xmit segment loss rate 0.011285, recv segment loss rate 0.000648, max timeouts 4.
+[2026/11/27-11:07:14] at line 810 of cfdp/library/libcfdpP.c, Can't find CFDP database.
+[2026/11/27-11:07:15] [?] Can't find ION security database.
+[2026/11/27-11:07:15] [i] Endpoint has been stopped.
+[2026/11/27-11:07:15] [i] Endpoint has been stopped.
+[2026/11/27-11:07:15] [i] Outduct has been stopped: 1
+[2026/11/27-11:07:15] [i] Administrative endpoint terminated.
+[2026/11/27-11:07:15] [i] Plan has been stopped: ipn:1.0
+[2026/11/27-11:07:15] [i] ltpclo outduct closed.
+[2026/11/27-11:07:15] [i] ipnadminep has ended.
+[2026/11/27-11:07:15] [i] ipnfw forwarder has ended.
+[2026/11/27-11:07:15] [i] ltpclo duct has ended.
+[2026/11/27-11:07:15] [i] bpclm has ended: ipn:1.0
+[2026/11/27-11:07:15] [i] ltpcli receiver thread has ended.
+[2026/11/27-11:07:15] [i] ltpcli duct has ended.
+[2026/11/27-11:07:15] [i] bpclock has ended.
+[2026/11/27-11:07:15] [i] bptransit has ended.
+[2026/11/27-11:07:16] [i] LSO to engine 1 is stopped.
+[2026/11/27-11:07:16] [i] LTP meter to engine 1 is stopped.
+[2026/11/27-11:07:16] [i] ltpmeter has ended.
+[2026/11/27-11:07:16] [i] udplsa receiver thread has ended.
+[2026/11/27-11:07:16] [i] udplsa receiver thread has ended.
+[2026/11/27-11:07:16] [i] ltpclock has ended.
+[2026/11/27-11:07:16] [i] udplsi has ended.
+[2026/11/27-11:07:16] [i] udplso has ended.
+[2026/11/27-11:07:16] [i] ltpdeliv has ended.
+[2026/11/27-11:07:17] [i] rfxclock has ended.
+[2026/11/27-11:07:18] at line 960 of bssp/library/libbsspP.c, Can't find BSSP database.

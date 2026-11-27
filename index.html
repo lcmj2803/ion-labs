@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Redes ION-DTN</title>
+<meta name="description" content="Prototipo de sistema de datos espaciales multicentro con ION (Interplanetary Overlay Network) de la NASA: Bundle Protocol v7 sobre LTP para enlaces con retardo e interrupciones. Propuesta presentada en IEEE LATINCOM 2024.">
+<meta name="theme-color" content="#03070B">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#03070B; --card:#08121B; --inset:#060E15; --line:#123349; --track:#0C2131;
+  --text:#BDEBFA; --muted:#5FA9C9; --faded:#3E6E86; --accent:#29C6F2; --active-bg:#0A2232;
+  --glow:rgba(41,198,242,.28); --hover:#E8FBFF; --warn:#F2C14E; --ok:#5FE0C4; --alarm:#FF6B5E;
+  --space:#B79CFF; --space-glow:rgba(183,156,255,.30);
+  --code-bg:#02070C; --com:#4C7A90; --fn:#E8FBFF;
+  --sans:'Space Grotesk',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background-color:var(--bg);background-image:radial-gradient(circle at 50% 0,rgba(183,156,255,.08),transparent 55%),linear-gradient(rgba(41,198,242,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(41,198,242,.035) 1px,transparent 1px);background-size:100% 100%,32px 32px,32px 32px;background-attachment:fixed;color:var(--text);font-family:var(--mono)}
+a{color:var(--text)}a:hover{color:var(--hover)}
+a:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+.wrap{max-width:1320px;margin:0 auto;padding:40px 16px 56px;display:flex;flex-direction:column;gap:28px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.label{font-size:12px;letter-spacing:.16em;color:var(--muted);text-transform:uppercase}
+.small{font-size:13px;color:var(--muted);line-height:1.6}
+.small b{color:var(--text)}
+code{font-family:var(--mono);color:var(--fn)}
+
+/* Portada */
+header{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:28px;align-items:start;border-bottom:1px solid var(--line);padding-bottom:28px}
+.hero-text{display:flex;flex-direction:column;gap:14px;min-width:0;padding-top:8px}
+h1{margin:0;font-family:var(--sans);font-weight:700;font-size:clamp(32px,5.4vw,52px);line-height:1.05;color:var(--accent);text-shadow:0 0 18px var(--glow)}
+h1 span{color:var(--space);text-shadow:0 0 18px var(--space-glow)}
+@media (max-width:980px){header{grid-template-columns:1fr}}
+.award{align-self:flex-start;display:inline-flex;gap:10px;align-items:center;border:1px solid var(--warn);border-radius:999px;padding:6px 14px;font-size:12.5px;color:var(--warn);background:rgba(242,193,78,.06)}
+.links{display:flex;flex-wrap:wrap;gap:10px}
+.links a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:8px;background:var(--inset);text-decoration:none;font-size:14px}
+.links a:hover{border-color:var(--accent);box-shadow:0 0 12px var(--glow)}
+
+/* Simulador */
+.sim{border:1px solid var(--space);border-radius:14px;box-shadow:0 0 28px var(--space-glow);background:var(--inset);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.sim-how{margin:0;padding-left:18px;font-size:12.5px;line-height:1.55;color:var(--muted)}
+.sim-how b{color:var(--text)}
+.net{width:100%;height:auto;display:block;background:var(--code-bg);border:1px solid var(--line);border-radius:10px}
+.net text{font-family:var(--mono);fill:var(--text)}
+.net .sub{fill:var(--muted)}
+.lnk{stroke-width:3;transition:stroke .2s}
+.lnk.up{stroke:var(--accent)}
+.lnk.down{stroke:var(--line);stroke-dasharray:6 7}
+.lnk.deep.up{stroke:var(--space)}
+.node circle{fill:var(--card);stroke:var(--muted);stroke-width:2}
+.node.has circle{stroke:var(--warn);stroke-width:3}
+.node.got circle{stroke:var(--ok);stroke-width:3}
+.badge{fill:var(--warn);font-weight:700}
+.bundle{stroke:#000;stroke-width:1.5}
+.bundle.cmd{fill:var(--warn)} .bundle.tlm{fill:var(--ok)}
+.tl text{font-family:var(--mono);fill:var(--muted)}
+.tl .win{fill:var(--accent);opacity:.85}
+.tl .win.deep{fill:var(--space)}
+.tl .cursor{stroke:var(--hover);stroke-width:2}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:8px;background:var(--active-bg);color:var(--text);font-family:var(--mono);font-size:13px;cursor:pointer;text-align:left}
+.btn:hover{border-color:var(--accent);box-shadow:0 0 12px var(--glow)}
+.btn[aria-pressed="true"]{border-color:var(--accent);color:var(--hover)}
+.btn.cmd{border-color:rgba(242,193,78,.55)} .btn.tlm{border-color:rgba(95,224,196,.55)}
+select.btn{padding-right:10px}
+.speed{display:flex;gap:6px}
+.speed .btn{min-height:36px;padding:0 10px}
+.verdict{border-radius:8px;padding:10px 12px;font-size:12.5px;line-height:1.55;border:1px solid var(--line);background:var(--card)}
+.verdict b{font-family:var(--sans);font-size:14px}
+.verdict .ok{color:var(--ok)} .verdict .bad{color:var(--alarm)}
+.log{margin:0;padding:8px 10px;list-style:none;font-size:11.5px;line-height:1.5;color:var(--muted);background:var(--code-bg);border:1px solid var(--line);border-radius:8px;height:104px;overflow-y:auto}
+.log li.ev{color:var(--text)} .log li.done{color:var(--ok)}
+details.plan summary{cursor:pointer;font-size:12.5px;color:var(--text);padding:8px 0}
+details.plan pre{max-height:220px}
+
+/* Cadena */
+.chain{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+.chain .step{flex:1 1 150px;border:1px solid var(--accent);border-radius:8px;padding:10px 12px;background:var(--active-bg);display:flex;flex-direction:column;gap:4px;box-shadow:0 0 14px var(--glow) inset}
+.chain .step.deep{border-color:var(--space);box-shadow:0 0 14px var(--space-glow) inset}
+.chain .step b{font-family:var(--sans);font-size:16px;color:var(--text)}
+.chain .step span.small{font-size:12px}
+.chain .arrow{align-self:center;color:var(--muted);font-size:12px;text-align:center}
+.chain .arrow small{display:block;color:var(--faded);font-size:11px;max-width:96px}
+.note{border-left:3px solid var(--warn);background:var(--inset);padding:10px 14px;border-radius:0 8px 8px 0;font-size:13px;line-height:1.6;color:var(--text);margin:0}
+.note b{color:var(--warn)}
+.note.ok{border-left-color:var(--ok)} .note.ok b{color:var(--ok)}
+
+.block{display:flex;flex-direction:column;gap:18px;padding:22px}
+.block-head{display:flex;flex-direction:column;gap:6px}
+h2{margin:0;font-family:var(--sans);font-size:26px;font-weight:700;color:var(--accent)}
+h3{margin:0;font-family:var(--sans);font-size:17px;color:var(--text)}
+.facts{display:flex;flex-wrap:wrap;gap:8px}
+.fact{border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:12px;color:var(--text);background:var(--inset)}
+.fact b{color:var(--accent)}
+.body{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));align-items:start}
+.col{display:flex;flex-direction:column;gap:16px;min-width:0}
+
+.grid5{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr))}
+.prob{border:1px solid var(--line);border-radius:10px;background:var(--inset);padding:14px;display:flex;flex-direction:column;gap:8px}
+.prob .n{font-size:11px;color:var(--faded);letter-spacing:.14em}
+.prob p{margin:0}
+
+.shot{box-shadow:0 0 16px rgba(41,198,242,.10);border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--code-bg);min-width:0}
+.shot-bar{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--line);background:var(--inset)}
+.dot{flex:none;width:11px;height:11px;border-radius:50%}
+.dot:nth-child(1){background:#29C6F2}.dot:nth-child(2){background:#1FA79B}.dot:nth-child(3){background:#1B4A66}
+.shot-bar .file{margin-left:8px;font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+pre{margin:0;padding:14px 16px;overflow-x:auto;font-size:12.5px;line-height:1.6;color:var(--text);tab-size:4}
+pre .c{color:var(--com);font-style:italic}
+
+.io{width:100%;border-collapse:collapse;font-size:12.5px}
+.io th,.io td{padding:7px 12px;border-bottom:1px solid var(--track);text-align:left;vertical-align:top;line-height:1.5}
+.io th{color:var(--muted);font-weight:500;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.io td:first-child{color:var(--fn);font-weight:700;white-space:nowrap}
+.io tr.warn td{color:var(--warn)}
+.scroll{overflow-x:auto}
+
+.timeline{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0}
+.timeline li{display:grid;grid-template-columns:120px 1fr;gap:16px;padding:12px 0;border-bottom:1px dashed var(--line)}
+.timeline li:last-child{border-bottom:0}
+.timeline .when{font-size:12px;color:var(--accent)}
+.timeline .what{font-size:13px;line-height:1.6;color:var(--text)}
+.timeline .what .small{display:block;margin-top:2px}
+.tag{display:inline-block;font-size:11px;padding:1px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);margin-left:6px;vertical-align:1px}
+.tag.done{border-color:var(--ok);color:var(--ok)} .tag.todo{border-color:var(--faded);color:var(--faded)} .tag.check{border-color:var(--warn);color:var(--warn)}
+@media (max-width:560px){.timeline li{grid-template-columns:1fr;gap:4px}}
+
+footer{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:20px;font-size:13px;color:var(--muted);line-height:1.6}
+footer ul{margin:0;padding-left:18px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="hero-text">
+    <p class="label" style="margin:0">Propuesta conceptual · 2024 → hoy · redes espaciales</p>
+    <h1>Redes <span>ION-DTN</span></h1>
+    <span class="award">🏆 Propuesta premiada · IEEE LATINCOM 2024 · Medellín</span>
+    <p class="small" style="margin:0;font-size:15px">Un prototipo de <b>sistema de datos espaciales multicentro</b> con <b>ION</b> (Interplanetary Overlay Network), la implementación de DTN de la NASA/JPL. Varios centros de control en tierra le hablan a una nave a través de una estación terrestre y un orbitador relé. Por el camino, la luz tarda minutos y los enlaces se abren y se cierran.</p>
+    <p class="small" style="margin:0">La idea central de DTN es <b>guardar y reenviar</b> (store-and-forward). Cada nodo guarda el mensaje (un <i>bundle</i>) en memoria persistente hasta que el siguiente enlace se abre. Internet, en cambio, necesita que todo el camino exista a la vez, de extremo a extremo.</p>
+    <nav class="links" aria-label="Accesos">
+      <a href="https://github.com/lcmj2803/ion-labs">Repositorio en GitHub</a>
+      <a href="#reto01">reto01 · primer nodo</a>
+      <a href="#problema">El problema</a>
+      <a href="https://lcmj2803.github.io/engineering_lab/">← Engineering Lab</a>
+    </nav>
+  </div>
+
+  <section class="sim" aria-label="Simulador de guardar y reenviar">
+    <span class="label">Pruébalo · simulación en el navegador</span>
+    <ol class="sim-how">
+      <li><b>Comando desde A o B</b> crea un bundle (amarillo) dirigido a la nave.</li>
+      <li><b>Telemetría</b> sale de la nave hacia los dos centros (verde): así funciona lo multicentro.</li>
+      <li>Mira dónde se queda <b>guardado</b> cada bundle mientras su siguiente enlace está cerrado, y cambia la distancia a Marte.</li>
+    </ol>
+
+    <svg class="net" id="net" viewBox="0 0 800 290" role="img" aria-labelledby="netTitle">
+      <title id="netTitle">Red de cinco nodos: Centro A y Centro B conectados a la Estación terrestre, la Estación al Orbitador relé y el relé a la Nave.</title>
+      <g id="links"></g>
+      <g id="nodes"></g>
+      <g id="bundles"></g>
+    </svg>
+
+    <svg class="tl" id="tl" viewBox="0 0 800 112" role="img" aria-label="Plan de contactos del ciclo de 180 minutos">
+      <g id="tlRows"></g>
+      <line class="cursor" id="tlCursor" x1="0" x2="0" y1="4" y2="92"/>
+    </svg>
+
+    <div class="row">
+      <button class="btn cmd" id="btnCmdA" type="button">Comando desde A</button>
+      <button class="btn cmd" id="btnCmdB" type="button">Comando desde B</button>
+      <button class="btn tlm" id="btnTlm" type="button">Telemetría a A y B</button>
+    </div>
+    <div class="row" style="justify-content:space-between">
+      <label class="small" for="dist">Tierra–Marte:&nbsp;
+        <select class="btn" id="dist">
+          <option value="3">cerca · 54,6 M km · 3 min</option>
+          <option value="12" selected>media · 225 M km · 12,5 min</option>
+          <option value="22">lejos · 401 M km · 22 min</option>
+        </select>
+      </label>
+      <div class="speed" role="group" aria-label="Velocidad de la simulación">
+        <button class="btn" type="button" id="btnPause" aria-pressed="false">Pausa</button>
+        <button class="btn" type="button" data-speed="2" aria-pressed="false">2×</button>
+        <button class="btn" type="button" data-speed="6" aria-pressed="true">6×</button>
+        <button class="btn" type="button" data-speed="20" aria-pressed="false">20×</button>
+      </div>
+    </div>
+    <div class="verdict" id="verdict" role="status" aria-live="polite"></div>
+    <ul class="log" id="log" aria-label="Eventos"></ul>
+    <details class="plan">
+      <summary>Ver este plan de contactos como comandos de <code>ionadmin</code></summary>
+      <div class="shot"><pre id="planOut"></pre></div>
+    </details>
+    <p class="small" style="margin:0">Supuestos: un ciclo de 180 min que se repite, ventanas y tasas ilustrativas, bundles pequeños (el tiempo de transmisión no cuenta) y ninguna pérdida. A 6×, 1 s real equivale a 6 min simulados.</p>
+  </section>
+</header>
+
+<section class="card" aria-label="Arquitectura" style="display:flex;flex-direction:column;gap:12px">
+  <span class="label">La cadena completa · lo que propone el prototipo</span>
+  <div class="chain">
+    <div class="step"><span class="label">Tierra</span><b>Centros de control A y B</b><span class="small">comando y telemetría con AMS · SM&amp;C</span></div><span class="arrow">→<small>BPv7 sobre LTP</small></span>
+    <div class="step"><span class="label">Tierra</span><b>Estación terrestre</b><span class="small">nodo ION en Ubuntu 22.04</span></div><span class="arrow">→<small>retardo de luz + ventanas</small></span>
+    <div class="step deep"><span class="label">Espacio · simulado</span><b>Relé</b><span class="small">red virtual en GNS3</span></div><span class="arrow">→<small>radio</small></span>
+    <div class="step deep"><span class="label">Espacio · hardware</span><b>Nave</b><span class="small">Raspberry Pi 3B+ con ION y cFS</span></div>
+  </div>
+  <p class="note"><b>Alcance:</b> es un prototipo de laboratorio. El retardo y las ventanas se emulan en una red virtual y la «nave» es una computadora de placa única. Lo que se prueba es la pila de protocolos y la interoperabilidad entre centros, no un enlace de RF real de espacio profundo.</p>
+</section>
+
+<!-- ============================ PROBLEMA ============================ -->
+<section class="card block" id="problema" aria-labelledby="h-prob">
+  <div class="block-head">
+    <span class="label">Por qué no basta con TCP/IP</span>
+    <h2 id="h-prob">Cinco problemas del espacio profundo</h2>
+    <p class="small" style="margin:0">Son los cinco problemas que plantea la propuesta. El primero se deriva en dos líneas, y de él sale casi todo lo demás.</p>
+  </div>
+  <div class="body">
+    <div class="col">
+      <div class="shot">
+        <div class="shot-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="file">Retardo de un solo sentido · t = d / c</span></div>
+<pre>c = 3,0 × 10⁸ m/s
+
+Tierra–Luna    3,84 × 10⁸ m  →  t ≈   1,3 s
+Marte (cerca)  5,46 × 10¹⁰ m →  t ≈   182 s ≈  3 min
+Marte (lejos)  4,01 × 10¹¹ m →  t ≈  1337 s ≈ 22 min
+
+<span class="c"># TCP: el primer byte de datos llega 1,5 RTT después</span>
+<span class="c"># de iniciar el handshake (SYN → SYN-ACK → ACK + datos)</span>
+RTT = 2t ≈ 44,6 min  →  1,5 RTT ≈ 67 min</pre>
+      </div>
+      <p class="small" style="margin:0">Y eso es solo si el camino se mantiene abierto todo ese tiempo. Si el orbitador pasa detrás del planeta a mitad del handshake, se empieza de nuevo. DTN quita las dos suposiciones de Internet: que existe un camino completo <b>ahora</b> y que la ida y vuelta es corta.</p>
+    </div>
+    <div class="grid5">
+      <div class="prob"><span class="n">01</span><h3>Retardo de propagación</h3><p class="small">De segundos a decenas de minutos. Ni el control en tiempo real ni el handshake funcionan.</p></div>
+      <div class="prob"><span class="n">02</span><h3>Conectividad intermitente</h3><p class="small">Ocultaciones planetarias, tormentas solares y fallas. Los enlaces existen por ventanas.</p></div>
+      <div class="prob"><span class="n">03</span><h3>Errores y pérdida</h3><p class="small">La potencia recibida cae con 1/d². Con más BER hay más retransmisiones, y cada una cuesta un RTT.</p></div>
+      <div class="prob"><span class="n">04</span><h3>Potencia y ancho de banda</h3><p class="small">La nave transmite con poca potencia, así que cada byte enviado tiene que valer.</p></div>
+      <div class="prob"><span class="n">05</span><h3>Interoperabilidad</h3><p class="small">Los protocolos propios de cada misión encarecen el soporte cruzado entre agencias. La solución son estándares CCSDS.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ SOLUCIÓN ============================ -->
+<section class="card block" id="solucion" aria-labelledby="h-sol">
+  <div class="block-head">
+    <span class="label">La pila · de arriba hacia abajo</span>
+    <h2 id="h-sol">Qué hace cada pieza</h2>
+    <p class="small" style="margin:0">ION es software en C para Linux. Corre como un conjunto de procesos que comparten una base de datos en memoria persistente: así sobrevive a que un enlace se cierre por horas.</p>
+  </div>
+  <div class="facts">
+    <span class="fact">ION <b>4.1.2</b></span>
+    <span class="fact">Bundle Protocol <b>v7</b> · RFC 9171</span>
+    <span class="fact">LTP · <b>RFC 5326</b></span>
+    <span class="fact">esquema de nombres <b>ipn:nodo.servicio</b></span>
+    <span class="fact">Ubuntu <b>22.04</b> · Raspberry Pi <b>3B+</b></span>
+  </div>
+  <div class="scroll">
+    <table class="io">
+      <thead><tr><th>Capa</th><th>Qué resuelve</th><th>En el prototipo</th></tr></thead>
+      <tbody>
+        <tr><td>AMS · SM&amp;C</td><td>Mensajería de comando y telemetría entre varios centros, sin que cada centro tenga que conocer a los demás.</td><td>Centros de control A y B</td></tr>
+        <tr><td>cFS</td><td>Marco de software de vuelo de la NASA: las aplicaciones de la nave.</td><td>En la Raspberry Pi</td></tr>
+        <tr><td>Bundle Protocol v7</td><td>Guardar y reenviar: cada nodo guarda el bundle hasta que se abre el siguiente contacto. El ruteo se calcula con el <b>plan de contactos</b> (Contact Graph Routing).</td><td>Todos los nodos ION</td></tr>
+        <tr><td>LTP</td><td>Transporte confiable para un solo salto con retardo largo. No hay handshake: retransmite solo los segmentos marcados como perdidos.</td><td>Convergencia bajo BP</td></tr>
+        <tr><td>UDP / radio</td><td>El enlace físico o el que se emula.</td><td>GNS3 · módulos de radio</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============================ RETO 01 ============================ -->
+<section class="card block" id="reto01" aria-labelledby="h-r1">
+  <div class="block-head">
+    <span class="label">Laboratorio · ion-labs/reto01 · noviembre 2026</span>
+    <h2 id="h-r1">Primer nodo: BPv7 sobre LTP, consigo mismo</h2>
+    <p class="small" style="margin:0">Antes de dos nodos, uno solo. El nodo <code>ipn:1</code> se manda bundles a sí mismo por LTP sobre UDP en <code>localhost:1113</code>. Si esto funciona, la pila completa está bien configurada, y solo falta cambiar la dirección del otro extremo para tener un segundo nodo.</p>
+  </div>
+  <div class="facts">
+    <span class="fact">nodo <b>ipn:1</b></span>
+    <span class="fact">endpoints <b>ipn:1.0</b> · <b>ipn:1.1</b></span>
+    <span class="fact">LTP sobre UDP <b>:1113</b></span>
+    <span class="fact">contacto de <b>3600 s</b> · <b>100 kB/s</b></span>
+  </div>
+  <div class="body">
+    <div class="col">
+      <div class="shot">
+        <div class="shot-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="file">host1.ionrc · el nodo y su plan de contactos</span></div>
+        <div class="scroll"><table class="io">
+          <thead><tr><th>Línea</th><th>Qué hace</th></tr></thead>
+          <tbody>
+            <tr><td>1 1 ''</td><td>Inicializa el nodo número 1, sin archivo de configuración extra.</td></tr>
+            <tr><td>s</td><td>Arranca ION.</td></tr>
+            <tr><td>a contact +1 +3600 1 1 100000</td><td>Del nodo 1 al nodo 1: el enlace existe desde dentro de 1 s hasta dentro de 3600 s, a 100 000 bytes/s.</td></tr>
+            <tr><td>a range +1 +3600 1 1 1</td><td>En ese intervalo, la luz tarda 1 s de un nodo al otro (OWLT).</td></tr>
+            <tr><td>m production 1000000</td><td rowspan="2">Tasas previstas de producción y consumo de datos. Con ellas <code>ionwarn</code> predice si se va a llenar la memoria («No congestion collapse predicted»).</td></tr>
+            <tr><td>m consumption 1000000</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+      <div class="shot">
+        <div class="shot-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="file">host1.bprc · host1.ipnrc · Bundle Protocol y ruteo</span></div>
+        <div class="scroll"><table class="io">
+          <thead><tr><th>Línea</th><th>Qué hace</th></tr></thead>
+          <tbody>
+            <tr><td>a scheme ipn 'ipnfw' 'ipnadminep'</td><td>Usa nombres <code>ipn:</code>, con su reenviador y su endpoint administrativo.</td></tr>
+            <tr><td>a endpoint ipn:1.1 q</td><td>Declara el endpoint 1.1. La <code>q</code> hace que los bundles se encolen si todavía no hay una aplicación escuchando.</td></tr>
+            <tr><td>a induct ltp 1 ltpcli</td><td>Recibe bundles del motor LTP 1.</td></tr>
+            <tr><td>a outduct ltp 1 ltpclo</td><td>Envía bundles por el motor LTP 1.</td></tr>
+            <tr><td>a plan 1 ltp/1</td><td>(ipnrc) Para llegar al nodo 1, usa el outduct <code>ltp/1</code>.</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="shot">
+        <div class="shot-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="file">host1.ltprc · el span LTP</span></div>
+<pre>1 32
+a span 1 32 32 1400 10000 1 'udplso localhost:1113'
+s 'udplsi localhost:1113'
+<span class="c"># span al motor 1: hasta 32 sesiones de envío y 32 de recepción,</span>
+<span class="c"># segmentos de 1400 B, agrupa bundles hasta 10 000 B o 1 s,</span>
+<span class="c"># y sale por UDP (udplso) / entra por UDP (udplsi) en :1113</span></pre>
+      </div>
+      <div class="shot">
+        <div class="shot-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="file">La prueba</span></div>
+<pre>$ ionstart -i host1.ionrc -l host1.ltprc -b host1.bprc -p host1.ipnrc
+$ bpsink ipn:1.1               <span class="c"># terminal 1: escucha en 1.1</span>
+$ bpsource ipn:1.1 "BPv7_OK"   <span class="c"># terminal 2: envía un bundle a 1.1</span>
+$ ionstop</pre>
+      </div>
+      <h3>Lo que enseñó el log</h3>
+      <div class="scroll"><table class="io">
+        <thead><tr><th>Mensaje en ion.log</th><th>Por qué</th></tr></thead>
+        <tbody>
+          <tr><td>Endpoint not known (ipn:1.10)</td><td><code>bpsink</code> solo puede abrir endpoints declarados en <code>bprc</code>. Solo existen 1.0 y 1.1.</td></tr>
+          <tr><td>Overlapping contact ignored</td><td>Al cargar <code>ionrc</code> por segunda vez se intenta agregar el mismo contacto. ION rechaza dos contactos solapados para el mismo par de nodos.</td></tr>
+          <tr><td>xmit segment loss rate 0.011285</td><td>Con BER máx. de 10⁻⁶, un segmento de 1400 B (11 200 bits) se pierde con probabilidad 1 − (1 − 10⁻⁶)<sup>11200</sup> ≈ 1,1 %. Es la misma cifra que calcula ION.</td></tr>
+          <tr class="warn"><td>running without bundle security</td><td>BPSec no está configurado. En un laboratorio local es esperable, pero hay que configurarlo antes de cualquier enlace real.</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ ESTADO ============================ -->
+<section class="card block" id="estado" aria-labelledby="h-est">
+  <div class="block-head">
+    <span class="label">Bitácora y próximos pasos</span>
+    <h2 id="h-est">Dónde va el proyecto</h2>
+  </div>
+  <ol class="timeline">
+    <li><span class="when">ago–sep 2024</span><span class="what">Propuesta: <i>Multi-Center Space Data System Prototype Using ION</i> <span class="tag done">hecho</span><span class="small">Tomó como base el prototipo multicentro de T. M. Rich (IEEE Aerospace Conference 2016).</span></span></li>
+    <li><span class="when">sep 2024</span><span class="what">ION compilado en Ubuntu 22.04 y probado con <code>bping</code>. Raspberry Pi 3B+ configurada por SSH. GNS3 instalado. <span class="tag done">hecho</span></span></li>
+    <li><span class="when">nov 2024</span><span class="what">Presentación en IEEE LATINCOM 2024, Medellín. <span class="tag done">premiada</span></span></li>
+    <li><span class="when">nov 2026</span><span class="what"><a href="#reto01">reto01</a>: un nodo con BPv7 sobre LTP/UDP en loopback. <span class="tag check">captura de bpsink por documentar</span></span></li>
+    <li><span class="when">siguiente</span><span class="what">Dos nodos en GNS3, con un <code>range</code> que emule el retardo Tierra–Marte. <span class="tag todo">por hacer</span></span></li>
+    <li><span class="when">después</span><span class="what">La Raspberry Pi como nodo de vuelo con cFS. Comando y telemetría AMS entre dos centros. Radio real en el último salto. <span class="tag todo">por hacer</span></span></li>
+  </ol>
+</section>
+
+<footer>
+  <span>Fuentes:</span>
+  <ul>
+    <li>T. M. Rich, «A Multi-Center Space Data System Prototype Based on CCSDS Standards», 2016 IEEE Aerospace Conference, Big Sky, MT, pp. 1–10.</li>
+    <li><a href="https://sourceforge.net/projects/ion-dtn/">ION (Interplanetary Overlay Network)</a>, NASA/JPL: código y manuales.</li>
+    <li><a href="https://www.rfc-editor.org/rfc/rfc9171">RFC 9171 · Bundle Protocol Version 7</a> · <a href="https://www.rfc-editor.org/rfc/rfc5326">RFC 5326 · Licklider Transmission Protocol</a>.</li>
+  </ul>
+  <span>El simulador implementa guardar y reenviar con un plan de contactos fijo, en JavaScript. No es ION ni una medición.</span>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var SVGNS = "http://www.w3.org/2000/svg";
+  function el(name, attrs, parent) {
+    var e = document.createElementNS(SVGNS, name);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+
+  // ---------- Red ----------
+  var CYCLE = 180; // minutos
+  var NODES = {
+    A: { x: 70,  y: 62,  ipn: 1, name: "Centro A", icon: "🏢" },
+    B: { x: 70,  y: 196, ipn: 2, name: "Centro B", icon: "🏢" },
+    E: { x: 280, y: 131, ipn: 3, name: "Estación", icon: "📡" },
+    R: { x: 510, y: 131, ipn: 4, name: "Relé", icon: "🛰️" },
+    N: { x: 730, y: 131, ipn: 5, name: "Nave", icon: "🚀" }
+  };
+  var owlt = 12; // min, enlace Estación–Relé
+  var LINKS = {
+    AE: { a: "A", b: "E", wins: [[0, 180]], deep: false, rate: 1250000, label: "A/B–Est." },
+    BE: { a: "B", b: "E", wins: [[0, 180]], deep: false, rate: 1250000 },
+    ER: { a: "E", b: "R", wins: [[15, 60], [105, 140]], deep: true, rate: 12500, label: "Est.–Relé" },
+    RN: { a: "R", b: "N", wins: [[70, 88], [150, 168]], deep: true, rate: 250000, label: "Relé–Nave" }
+  };
+  function linkKey(u, v) { return LINKS[u + v] ? u + v : v + u; }
+  function delay(key) { return key === "ER" ? owlt : 0.6; }
+  function isUp(key, t) {
+    var m = ((t % CYCLE) + CYCLE) % CYCLE;
+    return LINKS[key].wins.some(function (w) { return m >= w[0] && m < w[1]; });
+  }
+
+  var gL = $("links"), gN = $("nodes"), gB = $("bundles");
+  var linkEls = {}, nodeEls = {}, badgeEls = {};
+  Object.keys(LINKS).forEach(function (k) {
+    var L = LINKS[k], a = NODES[L.a], b = NODES[L.b];
+    linkEls[k] = el("line", { x1: a.x, y1: a.y, x2: b.x, y2: b.y, "class": "lnk" + (L.deep ? " deep" : "") }, gL);
+  });
+  var owltLabel = el("text", { x: 395, y: 112, "text-anchor": "middle", "font-size": 20, "class": "sub" }, gL);
+  Object.keys(NODES).forEach(function (k) {
+    var n = NODES[k], g = el("g", { "class": "node" }, gN);
+    el("circle", { cx: n.x, cy: n.y, r: 30 }, g);
+    var ic = el("text", { x: n.x, y: n.y + 9, "text-anchor": "middle", "font-size": 26 }, g); ic.textContent = n.icon;
+    var t1 = el("text", { x: n.x, y: n.y + 56, "text-anchor": "middle", "font-size": 23 }, g); t1.textContent = n.name;
+    var t2 = el("text", { x: n.x, y: n.y + 78, "text-anchor": "middle", "font-size": 18, "class": "sub" }, g); t2.textContent = "ipn:" + n.ipn;
+    var bd = el("text", { x: n.x + 30, y: n.y - 26, "text-anchor": "middle", "font-size": 20, "class": "badge" }, g);
+    nodeEls[k] = g; badgeEls[k] = bd;
+  });
+
+  // ---------- Línea de tiempo ----------
+  var TL_X0 = 120, TL_W = 670;
+  function tx(m) { return TL_X0 + (m / CYCLE) * TL_W; }
+  var tlRows = $("tlRows");
+  [["AE", 10], ["ER", 38], ["RN", 66]].forEach(function (r) {
+    var k = r[0], y = r[1], L = LINKS[k];
+    var lab = el("text", { x: 0, y: y + 15, "font-size": 17 }, tlRows); lab.textContent = L.label;
+    el("rect", { x: TL_X0, y: y, width: TL_W, height: 18, rx: 3, fill: "#0C2131" }, tlRows);
+    L.wins.forEach(function (w) {
+      el("rect", { x: tx(w[0]), y: y, width: tx(w[1]) - tx(w[0]), height: 18, rx: 3, "class": "win" + (L.deep ? " deep" : "") }, tlRows);
+    });
+  });
+  [0, 30, 60, 90, 120, 150, 180].forEach(function (m) {
+    var t = el("text", { x: tx(m), y: 108, "font-size": 15, "text-anchor": m === 0 ? "start" : (m === 180 ? "end" : "middle") }, tlRows);
+    t.textContent = m === 180 ? "180 min" : String(m);
+  });
+
+  // ---------- Plan de contactos en sintaxis ionadmin ----------
+  function renderPlan() {
+    var out = ["# Un ciclo de 180 min, en segundos desde el arranque", "# a contact <inicio> <fin> <de> <a> <bytes/s>", "# a range   <inicio> <fin> <de> <a> <OWLT s>"];
+    Object.keys(LINKS).forEach(function (k) {
+      var L = LINKS[k], a = NODES[L.a].ipn, b = NODES[L.b].ipn;
+      L.wins.forEach(function (w) {
+        var s = "+" + Math.max(1, w[0] * 60), e = "+" + (w[1] * 60);
+        out.push("a contact " + s + " " + e + " " + a + " " + b + " " + L.rate);
+        out.push("a contact " + s + " " + e + " " + b + " " + a + " " + L.rate);
+        out.push("a range   " + s + " " + e + " " + a + " " + b + " " + Math.round(delay(k) * 60));
+      });
+    });
+    $("planOut").textContent = out.join("\n");
+  }
+
+  // ---------- Bundles ----------
+  var bundles = [], seq = 0, t = 0, speed = 6, paused = false;
+  function fmt(m) {
+    var tot = Math.floor(m), h = Math.floor(tot / 60), mm = tot % 60;
+    return "T+" + h + ":" + (mm < 10 ? "0" : "") + mm;
+  }
+  function log(msg, cls) {
+    var li = document.createElement("li");
+    li.textContent = fmt(t) + "  " + msg;
+    if (cls) li.className = cls;
+    var L = $("log"); L.insertBefore(li, L.firstChild);
+    while (L.children.length > 60) L.removeChild(L.lastChild);
+  }
+  function addBundle(path, kind) {
+    seq += 1;
+    var b = { id: seq, path: path, hop: 0, state: "stored", kind: kind, created: t, dot: el("circle", { r: 9, "class": "bundle " + kind }, gB) };
+    bundles.push(b);
+    var dest = NODES[path[path.length - 1]];
+    log("bundle #" + b.id + " creado en " + NODES[path[0]].name + " → ipn:" + dest.ipn + "." + (kind === "cmd" ? "1" : "2"), "ev");
+  }
+  $("btnCmdA").addEventListener("click", function () { addBundle(["A", "E", "R", "N"], "cmd"); });
+  $("btnCmdB").addEventListener("click", function () { addBundle(["B", "E", "R", "N"], "cmd"); });
+  $("btnTlm").addEventListener("click", function () {
+    addBundle(["N", "R", "E", "A"], "tlm");
+    addBundle(["N", "R", "E", "B"], "tlm");
+  });
+
+  function step(dt) {
+    t += dt;
+    bundles.forEach(function (b) {
+      if (b.state === "stored") {
+        var u = b.path[b.hop], v = b.path[b.hop + 1], k = linkKey(u, v);
+        if (isUp(k, t)) {
+          b.state = "transit"; b.dep = t; b.arr = t + delay(k);
+          if (k === "ER") log("#" + b.id + " sale de " + NODES[u].name + " · llega en " + delay(k) + " min (luz)");
+        }
+      } else if (b.state === "transit" && t >= b.arr) {
+        b.hop += 1;
+        if (b.hop === b.path.length - 1) {
+          b.state = "done";
+          log("#" + b.id + " entregado en " + NODES[b.path[b.hop]].name + " tras " + Math.round(t - b.created) + " min", "done");
+          var dot = b.dot; setTimeout(function () { if (dot.parentNode) dot.parentNode.removeChild(dot); }, 1500);
+          b.doneAt = performance.now();
+        } else {
+          b.state = "stored";
+          var nk = linkKey(b.path[b.hop], b.path[b.hop + 1]);
+          if (!isUp(nk, t)) log("#" + b.id + " guardado en " + NODES[b.path[b.hop]].name + " · espera el próximo contacto");
+        }
+      }
+    });
+    bundles = bundles.filter(function (b) { return b.state !== "done" || performance.now() - b.doneAt < 1500; });
+  }
+
+  function draw() {
+    Object.keys(LINKS).forEach(function (k) {
+      var up = isUp(k, t);
+      linkEls[k].classList.toggle("up", up);
+      linkEls[k].classList.toggle("down", !up);
+    });
+    owltLabel.textContent = "luz: " + owlt + " min";
+    var stored = { A: 0, B: 0, E: 0, R: 0, N: 0 }, got = {};
+    var slot = {};
+    bundles.forEach(function (b) {
+      var x, y;
+      if (b.state === "transit") {
+        var a = NODES[b.path[b.hop]], c = NODES[b.path[b.hop + 1]];
+        var f = Math.min(1, (t - b.dep) / (b.arr - b.dep));
+        x = a.x + (c.x - a.x) * f; y = a.y + (c.y - a.y) * f;
+      } else {
+        var nk = b.path[b.hop], n = NODES[nk];
+        if (b.state === "stored") stored[nk] += 1; else got[nk] = true;
+        var i = slot[nk] = (slot[nk] || 0) + 1;
+        x = n.x - 26 + ((i - 1) % 4) * 17; y = n.y - 46 - Math.floor((i - 1) / 4) * 17;
+      }
+      b.dot.setAttribute("cx", x.toFixed(1)); b.dot.setAttribute("cy", y.toFixed(1));
+    });
+    Object.keys(NODES).forEach(function (k) {
+      nodeEls[k].classList.toggle("has", stored[k] > 0);
+      nodeEls[k].classList.toggle("got", !!got[k]);
+      badgeEls[k].textContent = stored[k] > 0 ? stored[k] : "";
+    });
+    var m = ((t % CYCLE) + CYCLE) % CYCLE, cx = tx(m).toFixed(1);
+    $("tlCursor").setAttribute("x1", cx); $("tlCursor").setAttribute("x2", cx);
+
+    var er = isUp("ER", t), rn = isUp("RN", t);
+    var ip = er && rn;
+    $("verdict").innerHTML =
+      "<b>" + fmt(t) + "</b> · ciclo " + Math.floor(m) + "/180 min<br>" +
+      "Estación–Relé " + (er ? "<span class=ok>abierto</span>" : "<span class=bad>cerrado</span>") +
+      " · Relé–Nave " + (rn ? "<span class=ok>abierto</span>" : "<span class=bad>cerrado</span>") + "<br>" +
+      (ip ? "Hay camino completo: IP podría pasar en este instante."
+          : "<span class=bad>IP extremo a extremo: sin ruta.</span> Las dos ventanas nunca coinciden, así que IP no entrega nunca. DTN sí: guarda y espera.");
+  }
+
+  var last = performance.now();
+  function tick(now) {
+    var dtReal = Math.min(0.1, (now - last) / 1000); last = now;
+    if (!paused) {
+      var dt = dtReal * speed, sub = Math.max(1, Math.ceil(dt / 0.25));
+      for (var i = 0; i < sub; i++) step(dt / sub);
+    }
+    draw();
+    requestAnimationFrame(tick);
+  }
+
+  $("dist").addEventListener("change", function () {
+    owlt = Number(this.value); renderPlan();
+    log("distancia Tierra–Marte cambiada: luz " + owlt + " min", "ev");
+  });
+  $("btnPause").addEventListener("click", function () {
+    paused = !paused; this.setAttribute("aria-pressed", String(paused));
+    this.textContent = paused ? "Seguir" : "Pausa";
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-speed]"), function (b) {
+    b.addEventListener("click", function () {
+      speed = Number(b.getAttribute("data-speed"));
+      Array.prototype.forEach.call(document.querySelectorAll("[data-speed]"), function (o) { o.setAttribute("aria-pressed", String(o === b)); });
+    });
+  });
+
+  renderPlan();
+  log("red arrancada: plan de contactos cargado", "ev");
+  addBundle(["A", "E", "R", "N"], "cmd");
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

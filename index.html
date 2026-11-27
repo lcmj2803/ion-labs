@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Redes ION-DTN</title>
-<meta name="description" content="Prototipo de sistema de datos espaciales multicentro con ION (Interplanetary Overlay Network) de la NASA: Bundle Protocol v7 sobre LTP para enlaces con retardo e interrupciones. Propuesta presentada en IEEE LATINCOM 2024.">
+<meta name="description" content="Prototipo de sistema de datos espaciales multicentro con ION (Interplanetary Overlay Network) de la NASA: Bundle Protocol v7 sobre LTP para enlaces con retardo e interrupciones. Ganador de la ComSoc LATAM Student ICT Innovation Competition 2024 (IEEE ComSoc Región 9).">
 <meta name="theme-color" content="#03070B">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
@@ -141,7 +141,7 @@ footer ul{margin:0;padding-left:18px}
   <div class="hero-text">
     <p class="label" style="margin:0">Propuesta conceptual · 2024 → hoy · redes espaciales</p>
     <h1>Redes <span>ION-DTN</span></h1>
-    <span class="award">🏆 Propuesta premiada · IEEE LATINCOM 2024 · Medellín</span>
+    <span class="award">🏆 Ganador 2024 · ComSoc LATAM Student ICT Innovation Competition · IEEE ComSoc Región 9</span>
     <p class="small" style="margin:0;font-size:15px">Un prototipo de <b>sistema de datos espaciales multicentro</b> con <b>ION</b> (Interplanetary Overlay Network), la implementación de DTN de la NASA/JPL. Varios centros de control en tierra le hablan a una nave a través de una estación terrestre y un orbitador relé. Por el camino, la luz tarda minutos y los enlaces se abren y se cierran.</p>
     <p class="small" style="margin:0">La idea central de DTN es <b>guardar y reenviar</b> (store-and-forward). Cada nodo guarda el mensaje (un <i>bundle</i>) en memoria persistente hasta que el siguiente enlace se abre. Internet, en cambio, necesita que todo el camino exista a la vez, de extremo a extremo.</p>
     <nav class="links" aria-label="Accesos">
@@ -363,7 +363,7 @@ $ ionstop</pre>
   <ol class="timeline">
     <li><span class="when">ago–sep 2024</span><span class="what">Propuesta: <i>Multi-Center Space Data System Prototype Using ION</i> <span class="tag done">hecho</span><span class="small">Tomó como base el prototipo multicentro de T. M. Rich (IEEE Aerospace Conference 2016).</span></span></li>
     <li><span class="when">sep 2024</span><span class="what">ION compilado en Ubuntu 22.04 y probado con <code>bping</code>. Raspberry Pi 3B+ configurada por SSH. GNS3 instalado. <span class="tag done">hecho</span></span></li>
-    <li><span class="when">nov 2024</span><span class="what">Presentación en IEEE LATINCOM 2024, Medellín. <span class="tag done">premiada</span></span></li>
+    <li><span class="when">nov 2024</span><span class="what">Ganador de la <b>ComSoc LATAM Student ICT Innovation Competition 2024</b> (IEEE ComSoc Región 9) con «NASA's ION for Communication in Deep Space», por la Sección Panamá. Presentado en Medellín, en IEEE LATINCOM 2024. <span class="tag done">ganador</span></span></li>
     <li><span class="when">nov 2026</span><span class="what"><a href="#reto01">reto01</a>: un nodo con BPv7 sobre LTP/UDP en loopback. <code>bpsink</code> recibió <code>'BPv7_OK'</code> (<a href="https://github.com/lcmj2803/ion-labs/blob/main/reto01/bpsink_captura.txt">captura</a>). <span class="tag done">hecho</span></span></li>
     <li><span class="when">siguiente</span><span class="what">Dos nodos en GNS3, con un <code>range</code> que emule el retardo Tierra–Marte. <span class="tag todo">por hacer</span></span></li>
     <li><span class="when">después</span><span class="what">La Raspberry Pi como nodo de vuelo con cFS. Comando y telemetría AMS entre dos centros. Radio real en el último salto. <span class="tag todo">por hacer</span></span></li>
